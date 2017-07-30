@@ -1,7 +1,9 @@
 # CIFAR-10
 [![Build Status](https://travis-ci.org/DanRuta/cifar10.svg?branch=master)](https://travis-ci.org/DanRuta/cifar10) [![Coverage Status](https://coveralls.io/repos/github/DanRuta/cifar10/badge.svg?branch=master)](https://coveralls.io/github/DanRuta/cifar10?branch=master)
 
-This is a helper library for loading the CIFAR-10 data set into either nodejs or the browser. It uses the entire data set (60000 items, across 10 classifications). Read more and **download the binary data set from [here](https://www.cs.toronto.edu/~kriz/cifar.html)**. Once downloaded, place all 6 ```.bin``` files next to the ```converter.js``` file and run the file, which will re-structure/re-categorise them into the data folder, for more efficient use with the library.
+[![NPM](https://nodei.co/npm/cifar10.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/cifar10/)
+
+This is a helper library for loading the CIFAR-10 data set into either nodejs or the browser. It uses the entire data set (60000 items, across 10 classifications). Read more and **download the binary data set from [here](https://www.cs.toronto.edu/~kriz/cifar.html)**, if you don't have it already in the data folder. Once downloaded, place all 6 ```.bin``` files next to the ```converter.js``` file and run the file, which will re-structure/re-categorise them into the data folder, for more efficient use with the library.
 
 This library is inspired by [the MNIST library](https://github.com/cazala/mnist) by cazala, and the API is similar. People who have used the MNIST library should find this familiar. There are, however, a few key differences, due to the fact that there is far too much data (~175Mb) to load all at once.
 
@@ -102,6 +104,8 @@ CIFAR10.render(dogImage, context)
 You may want to use CSS to stretch out the canvas, if you want to actually see the images, as they are quite small.
 
 ## Credit
+
+The CIFAR-10 data redistributed here came from [here](https://www.cs.toronto.edu/~kriz/cifar.html). Apart from reorganizing/recategorizing, the data is the same, minus the labels. If for any reason the files from this repo are not ok, you can regenerate them from the original by running the ```converter.js``` file, after placing it in the same directory as the 6 original .bin files.
 
 The idea for this project came from cazala's MNIST library which I've used in the past. I decided to keep the API design similar due to the ease of use, familiarity and consistency.
 
