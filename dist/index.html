@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CIFAR-10 Client Demo</title>
+    <script src="cifar10-client.min.js"></script>
+</head>
+<style>
+    canvas {
+        height: 64px;
+    }
+    #output {
+        height: 136px;
+        overflow: auto;
+    }
+    .flexTable {
+        display: flex;
+        flex-direction: column;
+    }
+    .flexTable > div {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        margin: 10px;
+    }
+    .flexTable > div > :not(script) {
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+        min-height: 25px;
+        padding: 0;
+        margin: 3px 0 3px 0;
+    }
+    .flexTable > div > div:nth-child(1){
+        min-width: 100px;
+        margin-right: 10px;
+        justify-content: flex-end;
+    }
+    .flexTable > div > div > input[type="submit"], .flexTable > div > div > a {
+        align-self: flex-start !important;
+    }
+    .flexTable > div > div > span.view-calendar > input {
+        width: 95%;
+    }
+    .lengthOutput {
+        height: 21px;
+    }
+</style>
+<script>
+    "use strict"
+
+    window.addEventListener("load", () => {
+
+        const fillOutput = images => {
+            images.forEach(image => {
+                const canvas = document.createElement("canvas")
+                canvas.height = 32
+                canvas.width = 32
+                const context = canvas.getContext("2d")
+                CIFAR10.render(image, context)
+                output.appendChild(canvas)
+            })
+        }
+
+        // Get random
+        Array.from(document.querySelectorAll(".getRandom")).forEach(button => {
+            
+            const category = button.parentNode.parentNode.querySelector(".label").innerHTML.toLowerCase()
+
+            button.addEventListener("click", async () => {
+
+                output.innerHTML = ""
+                const data = await CIFAR10[category].training.get()
+                fillOutput([data])
+            })
+        })
+
+        // Get Index List
+        Array.from(document.querySelectorAll(".getIndexList")).forEach(button => {
+
+            const category = button.parentNode.parentNode.querySelector(".label").innerHTML.toLowerCase()
+
+            button.addEventListener("click", async () => {
+
+                const indexList = button.parentNode.querySelector("input").value.replace(/\s/g, "")
+                    .split(",").map(number => parseInt(number))
+
+                output.innerHTML = ""
+                const data = await CIFAR10[category].training.get({category, indexList})
+
+                fillOutput(data)
+            })
+        })
+
+        // Get Range
+        Array.from(document.querySelectorAll(".getRange")).forEach(button => {
+
+            const category = button.parentNode.parentNode.querySelector(".label").innerHTML.toLowerCase()
+
+            button.addEventListener("click", async () => {
+
+                const startIndex = parseInt(button.parentNode.querySelector(".rangeStartInput").value) | 0
+                const endIndex = parseInt(button.parentNode.querySelector(".rangeEndInput").value) || startIndex+1
+
+                output.innerHTML = ""
+                const data = await CIFAR10[category].range(startIndex, endIndex)
+
+                fillOutput(data)
+            })
+        })
+
+        // Get Training
+        getTrainingButton.addEventListener("click", async () => {
+            output.innerHTML = ""
+            const data = await CIFAR10.training.get(parseInt(getInput.value)|0)
+            fillOutput(data)
+        })
+
+        // Get Test
+        getTestButton.addEventListener("click", async () => {
+            output.innerHTML = ""
+            const data = await CIFAR10.test.get(parseInt(getInput.value)|0)
+            fillOutput(data)
+        })
+
+        // Lengths
+        printTrainingLength.addEventListener("click", async () => {
+            const length = await CIFAR10.training.length()
+            lengthOutput.innerHTML = length
+        })
+
+        printTestLength.addEventListener("click", async () => {
+            const length = await CIFAR10.test.length()
+            lengthOutput.innerHTML = length
+        })
+
+        Array.from(document.querySelectorAll(".printTrainingLength")).forEach(button => {
+            const category = button.parentNode.parentNode.querySelector(".label").innerHTML.toLowerCase()
+            const output = button.parentNode.querySelector(".lengthOutput")
+
+            button.addEventListener("click", async () => {
+                output.innerHTML = "" 
+                const length = await CIFAR10[category].training.length()
+                output.innerHTML = length
+            })
+        })
+
+        Array.from(document.querySelectorAll(".printTestLength")).forEach(button => {
+            const category = button.parentNode.parentNode.querySelector(".label").innerHTML.toLowerCase()
+            const output = button.parentNode.querySelector(".lengthOutput")
+
+            button.addEventListener("click", async () => {
+                output.innerHTML = "" 
+                const length = await CIFAR10[category].test.length()
+                output.innerHTML = length
+            })
+        })
+
+        // Set
+        setButton.addEventListener("click", () => {
+            CIFAR10.set(parseInt(setTrainingSize.value), parseInt(setTestSize.value))
+        })
+
+        resetButton.addEventListener("click", () => {
+            CIFAR10.reset()
+        })
+    })
+</script>
+<body>
+
+<div id="output"></div>
+
+<hr>
+<div>
+    <input type="number" id="setTrainingSize" placeholder="Training">
+    <input type="number" id="setTestSize" placeholder="Test">
+    <button id="setButton">Set</button>
+</div>
+<div>
+    <input type="number" id="getInput" value="100">
+    <button id="getTrainingButton">Get Training</button>
+    <button id="getTestButton">Get Test</button>
+</div>
+<div>
+    <button id="resetButton">Reset</button>
+</div>
+<div>
+    <button id="printTrainingLength">Print Training Length</button>
+    <button id="printTestLength">Print Test Length</button>
+    <span id="lengthOutput"></span>
+</div>
+<hr>
+
+<span>Using images from the training split</span>
+<div class="flexTable">
+    <div>
+        <div class="label">Airplane</div>
+        <div>
+            <button class="getRandom">Get Random</button>
+            <button class="getIndexList">Get Index List</button>
+            <input type="text" placeholder="comma separated integers..">
+        </div>
+        <div>
+            <button class="getRange">Get Range</button>
+            <input type="number" class="rangeStartInput" placeholder="start index">
+            <input type="number" class="rangeEndInput" placeholder="end index">
+        </div>
+        <div>
+            <button class="printTrainingLength">Print Training Length</button>
+            <button class="printTestLength">Print Test Length</button>
+            <div class="lengthOutput"></div>
+        </div>
+    </div>
+    <div>
+        <div class="label">Automobile</div>
+        <div>
+            <button class="getRandom">Get Random</button>
+            <button class="getIndexList">Get Index List</button>
+            <input type="text" placeholder="comma separated integers..">
+        </div>
+        <div>
+            <button class="getRange">Get Range</button>
+            <input type="number" class="rangeStartInput" placeholder="start index">
+            <input type="number" class="rangeEndInput" placeholder="end index">
+        </div>
+        <div>
+            <button class="printTrainingLength">Print Training Length</button>
+            <button class="printTestLength">Print Test Length</button>
+            <div class="lengthOutput"></div>
+        </div>
+    </div>
+    <div>
+        <div class="label">Bird</div>
+        <div>
+            <button class="getRandom">Get Random</button>
+            <button class="getIndexList">Get Index List</button>
+            <input type="text" placeholder="comma separated integers..">
+        </div>
+        <div>
+            <button class="getRange">Get Range</button>
+            <input type="number" class="rangeStartInput" placeholder="start index">
+            <input type="number" class="rangeEndInput" placeholder="end index">
+        </div>
+        <div>
+            <button class="printTrainingLength">Print Training Length</button>
+            <button class="printTestLength">Print Test Length</button>
+            <div class="lengthOutput"></div>
+        </div>
+    </div>
+    <div>
+        <div class="label">Cat</div>
+        <div>
+            <button class="getRandom">Get Random</button>
+            <button class="getIndexList">Get Index List</button>
+            <input type="text" placeholder="comma separated integers..">
+        </div>
+        <div>
+            <button class="getRange">Get Range</button>
+            <input type="number" class="rangeStartInput" placeholder="start index">
+            <input type="number" class="rangeEndInput" placeholder="end index">
+        </div>
+        <div>
+            <button class="printTrainingLength">Print Training Length</button>
+            <button class="printTestLength">Print Test Length</button>
+            <div class="lengthOutput"></div>
+        </div>
+    </div>
+    <div>
+        <div class="label">Deer</div>
+        <div>
+            <button class="getRandom">Get Random</button>
+            <button class="getIndexList">Get Index List</button>
+            <input type="text" placeholder="comma separated integers..">
+        </div>
+        <div>
+            <button class="getRange">Get Range</button>
+            <input type="number" class="rangeStartInput" placeholder="start index">
+            <input type="number" class="rangeEndInput" placeholder="end index">
+        </div>
+        <div>
+            <button class="printTrainingLength">Print Training Length</button>
+            <button class="printTestLength">Print Test Length</button>
+            <div class="lengthOutput"></div>
+        </div>
+    </div>
+    <div>
+        <div class="label">Dog</div>
+        <div>
+            <button class="getRandom">Get Random</button>
+            <button class="getIndexList">Get Index List</button>
+            <input type="text" placeholder="comma separated integers..">
+        </div>
+        <div>
+            <button class="getRange">Get Range</button>
+            <input type="number" class="rangeStartInput" placeholder="start index">
+            <input type="number" class="rangeEndInput" placeholder="end index">
+        </div>
+        <div>
+            <button class="printTrainingLength">Print Training Length</button>
+            <button class="printTestLength">Print Test Length</button>
+            <div class="lengthOutput"></div>
+        </div>
+    </div>
+    <div>
+        <div class="label">Frog</div>
+        <div>
+            <button class="getRandom">Get Random</button>
+            <button class="getIndexList">Get Index List</button>
+            <input type="text" placeholder="comma separated integers..">
+        </div>
+        <div>
+            <button class="getRange">Get Range</button>
+            <input type="number" class="rangeStartInput" placeholder="start index">
+            <input type="number" class="rangeEndInput" placeholder="end index">
+        </div>
+        <div>
+            <button class="printTrainingLength">Print Training Length</button>
+            <button class="printTestLength">Print Test Length</button>
+            <div class="lengthOutput"></div>
+        </div>
+    </div>
+    <div>
+        <div class="label">Horse</div>
+        <div>
+            <button class="getRandom">Get Random</button>
+            <button class="getIndexList">Get Index List</button>
+            <input type="text" placeholder="comma separated integers..">
+        </div>
+        <div>
+            <button class="getRange">Get Range</button>
+            <input type="number" class="rangeStartInput" placeholder="start index">
+            <input type="number" class="rangeEndInput" placeholder="end index">
+        </div>
+        <div>
+            <button class="printTrainingLength">Print Training Length</button>
+            <button class="printTestLength">Print Test Length</button>
+            <div class="lengthOutput"></div>
+        </div>
+    </div>
+    <div>
+        <div class="label">Ship</div>
+        <div>
+            <button class="getRandom">Get Random</button>
+            <button class="getIndexList">Get Index List</button>
+            <input type="text" placeholder="comma separated integers..">
+        </div>
+        <div>
+            <button class="getRange">Get Range</button>
+            <input type="number" class="rangeStartInput" placeholder="start index">
+            <input type="number" class="rangeEndInput" placeholder="end index">
+        </div>
+        <div>
+            <button class="printTrainingLength">Print Training Length</button>
+            <button class="printTestLength">Print Test Length</button>
+            <div class="lengthOutput"></div>
+        </div>
+    </div>
+    <div>
+        <div class="label">Truck</div>
+        <div>
+            <button class="getRandom">Get Random</button>
+            <button class="getIndexList">Get Index List</button>
+            <input type="text" placeholder="comma separated integers..">
+        </div>
+        <div>
+            <button class="getRange">Get Range</button>
+            <input type="number" class="rangeStartInput" placeholder="start index">
+            <input type="number" class="rangeEndInput" placeholder="end index">
+        </div>
+        <div>
+            <button class="printTrainingLength">Print Training Length</button>
+            <button class="printTestLength">Print Test Length</button>
+            <div class="lengthOutput"></div>
+        </div>
+    </div>    
+</div>
+
+
+</body>
+</html>
