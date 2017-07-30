@@ -1,4 +1,5 @@
 # CIFAR-10
+[![Build Status](https://travis-ci.org/DanRuta/cifar10.svg?branch=master)](https://travis-ci.org/DanRuta/cifar10) [![Coverage Status](https://coveralls.io/repos/github/DanRuta/cifar10/badge.svg?branch=master)](https://coveralls.io/github/DanRuta/cifar10?branch=master)
 
 This is a helper library for loading the CIFAR-10 data set into either nodejs or the browser. It uses the entire data set (60000 items, across 10 classifications). Read more and **download the binary data set from [here](https://www.cs.toronto.edu/~kriz/cifar.html)**. Once downloaded, place all 6 ```.bin``` files next to the ```converter.js``` file and run the file, which will re-structure/re-categorise them into the data folder, for more efficient use with the library.
 
@@ -23,7 +24,7 @@ CIFAR10.render(data, context)
 
 ## Usage
 
-If using in Nodejs, you can just use the cifar10.js file, which will load the data from the data files. If using in the browser, you can either call the data from cifar10.js through your own nodejs server and front end code, or you can use the included cifar10-server.js and/or cifar10-client.min.js to serve the data to a browser, where you can use (almost) the same API as in nodejs to get the data. The only difference is when using ```.length```, as this is now an async function, ```.length()```, resolving data from the server. 
+If using in Nodejs, you can just use the cifar10.js file, which will load the data from the data files. If using in the browser, you can either call the data from cifar10.js through your own nodejs server and front end code, or you can use the included ```cifar10-server.js``` and/or ```cifar10-client.min.js``` to serve the data to a browser, where you can use (almost) the same API as in nodejs to get the data. The only difference is when using ```.length```, as this is now an async function, ```.length()```, resolving data from the server. 
 
 See below for examples, and more detail. A proper, real world demo will come when I finish adding Conv Layers to [the Network.js library](https://github.com/DanRuta/Network.js), but isolated examples can be seen in the index.html file in the dist folder.
 
